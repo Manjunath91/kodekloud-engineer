@@ -1,0 +1,47 @@
+As per details shared by Natuilus application dev team, they are planning to deploy ine newly developed application on Natuilus infra in Stratos DC. Application uses PostgreSQL database. So as a pre-requisite we need to setup PostgreSQL database server as per requirements shared below:
+
+a. Install and configure PostgreSQL database on Nautilus database server.
+
+yum install postgresql-server postgresql-contrib
+postgresql-setup initdb
+systemctl enable postgresql && systemctl start postgresql
+
+b. Create a database user kodekloud_aim and set its password to GyQkFRVNr3.
+
+echo -n 'GyQkFRVNr3' | md5sum
+20c59d9fe9be7db32e683554222f227c
+
+su - postgres
+psql postgres
+psql=# CREATE USER kodekloud_aim WITH ENCRYPTED PASSWORD 'GyQkFRVNr3';
+psql=# CREATE DATABASE kodekloud_db9 OWNER kodekloud_aim;
+
+c. Create a database kodekloud_db9 and grant full permissions to
+user kodekloud_aim on this database.
+
+psql=# GRANT ALL PRIVILEGES ON DATABASE kodekloud_db9 TO kodekloud_aim;
+
+d. Make appropriate settings to allow all local clients to
+connect to the kodekloud_db9 database through kodekloud_db9
+user using md5 encrypted password for authentication.
+
+edit pg_hba.conf change peer and ident to md5
+
+systemctl restart postgresql.service
+systemctl status postgresql.service
+
+e. At the end its good to test the db connection using these new
+credentials from root user or server’s sudo user.
+
+try to connect psql using root does not work
+    psql -U root -h localhost -d kodekloud_db9 -W 
+Failed 
+
+Connect using kodekloud_aim 
+    psql -U kodekloud_aim -d kodekloud_db9 -h 127.0.0.1 -W
+
+Works OK
+
+
+
+
